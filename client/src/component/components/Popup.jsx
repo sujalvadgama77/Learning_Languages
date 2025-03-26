@@ -1,7 +1,21 @@
-
 // eslint-disable-next-line react/prop-types
-const Popup = ({ show, onClose, videoUrl }) => {
+const Popup = ({ show, onClose, currentLetter }) => {
   if (!show) return null;
+
+  const playDemoAudio = () => {
+    try {
+      // Construct the audio file path based on the pronunciation
+      const audioPath = `/audio/sanskrit/${currentLetter}.mp3`;
+      
+      // Create and play the audio
+      const audio = new Audio(audioPath);
+      audio.play().catch((error) => {
+        console.error("Error playing demo audio:", error);
+      });
+    } catch (error) {
+      console.error("Error in playDemoAudio:", error);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -15,20 +29,34 @@ const Popup = ({ show, onClose, videoUrl }) => {
         </button>
 
         {/* Heading */}
-        <h2 className="text-xl md:text-2xl font-semibold text-center mb-4 flex items-center justify-center">
-          Learn This from Here 📚
+        <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+          Listen and Learn 🎧
         </h2>
 
-        {/* Embedded Video */}
-        <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-          <iframe
-            src={videoUrl}
-            title="Helpful Video"
-            className="absolute inset-0 w-full h-full"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+        {/* Message */}
+        <p className="text-center text-gray-600 mb-8">
+          Listen to the correct pronunciation and try again
+        </p>
+
+        {/* Play Button */}
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={playDemoAudio}
+            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-full flex items-center space-x-2 transform transition-transform duration-200 hover:scale-105"
+          >
+            <span className="text-2xl">▶</span>
+            <span>Play Pronunciation</span>
+          </button>
+        </div>
+
+        {/* Try Again Button */}
+        <div className="flex justify-center">
+          <button
+            onClick={onClose}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-full transform transition-transform duration-200 hover:scale-105"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     </div>

@@ -38,6 +38,7 @@ const AudioRecorder = () => {
   const [totalPoints, setTotalPoints] = useState(50); // Default total points for the basic category
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
+  const [demoAudio, setDemoAudio] = useState(null);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("userId");
@@ -247,6 +248,26 @@ const AudioRecorder = () => {
     resetState();
   };
 
+  const playDemoAudio = () => {
+    try {
+      // Get the current letter's pronunciation
+      const currentLetter = categoryData[currentCardIndex].pronunciation;
+      
+      // Construct the audio file path based on the pronunciation
+      const audioPath = `/audio/sanskrit/${currentLetter}.mp3`;
+      
+      // Create and play the audio
+      const audio = new Audio(audioPath);
+      audio.play().catch((error) => {
+        console.error("Error playing demo audio:", error);
+        toast.error("Could not play demo audio");
+      });
+    } catch (error) {
+      console.error("Error in playDemoAudio:", error);
+      toast.error("Error playing demo audio");
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -292,8 +313,7 @@ const AudioRecorder = () => {
 
         <div className="button_container flex flex-wrap justify-center mb-4">
           <button
-            onClick={handlePlay}
-            disabled={!uploaded || recording}
+            onClick={playDemoAudio}
             className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-16 rounded mb-2 min-w-[425px] sm:min-w-[525px] md:min-w-[625px] text-lg"
           >
             Play Demo
@@ -367,7 +387,7 @@ const AudioRecorder = () => {
       <Popup
         show={showPopup}
         onClose={() => setShowPopup(false)}
-        videoUrl="https://www.youtube.com/embed/VW9AFwSO-Xo"
+        currentLetter={categoryData[currentCardIndex].pronunciation}
       />
     </>
   );
