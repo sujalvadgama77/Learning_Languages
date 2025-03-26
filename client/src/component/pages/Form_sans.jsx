@@ -181,7 +181,7 @@ const AudioRecorder = () => {
       console.log("Audio uploaded successfully:", responseData);
 
       const stringToCheck = JSON.stringify(responseData?.text)
-        .replace(/<s>|<\/s>|\s+/g, "")
+        .replace(/|<\/s>|\s+/g, "")
         .replace(/"/g, "");
 
       setResponse(stringToCheck);
@@ -289,6 +289,17 @@ const AudioRecorder = () => {
             )}
           </div>
         </div>
+
+        <div className="button_container flex flex-wrap justify-center mb-4">
+          <button
+            onClick={handlePlay}
+            disabled={!uploaded || recording}
+            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-16 rounded mb-2 min-w-[425px] sm:min-w-[525px] md:min-w-[625px] text-lg"
+          >
+            Play Demo
+          </button>
+        </div>
+
         <div className="button_container flex flex-wrap justify-center mb-4">
           <button
             onClick={startRecording}
@@ -311,13 +322,6 @@ const AudioRecorder = () => {
           >
             Upload Audio
           </button>
-          {/* <button
-            onClick={handlePlay}
-            disabled={!uploaded || recording}
-            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full sm:w-auto sm:mr-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-lg"
-          >
-            Play Recorded Audio
-          </button> */}
           <button
             onClick={() => setShowConfirmationDialog(true)}
             // disabled={!uploaded || recording}
@@ -326,6 +330,7 @@ const AudioRecorder = () => {
             Reset
           </button>
         </div>
+     
         {uploaded && (
           <p className="text-green-500 sm:text-lg">
             Audio uploaded successfully!

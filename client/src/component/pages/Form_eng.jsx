@@ -301,6 +301,17 @@ const AudioRecorder = () => {
             )}
           </div>
         </div>
+
+        <div className="button_container flex flex-wrap justify-center mb-4">
+          <button
+            onClick={handlePlay}
+            disabled={!uploaded || recording}
+            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-16 rounded mb-2 min-w-[425px] sm:min-w-[525px] md:min-w-[625px] text-lg"
+          >
+            Play Demo
+          </button>
+        </div>
+
         <div className="button_container flex flex-wrap justify-center mb-4">
           <button
             onClick={startRecording}

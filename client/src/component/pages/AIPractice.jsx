@@ -142,18 +142,17 @@ const AIPractice = () => {
               <div className="flex flex-col lg:flex-row gap-8">
                 {/* Left Column - LangBuddy */}
                 <div className="lg:w-1/3">
-                  <div className="bg-white p-6 rounded-xl shadow-lg h-[600px] flex flex-col">
+                  <div className="bg-gradient-to-br from-purple-50 via-white to-purple-50 p-6 rounded-xl shadow-[0_0_30px_rgba(147,51,234,0.15)] h-[600px] flex flex-col">
                     <h2 className="text-2xl font-bold text-center mb-4 text-purple-600">
                       {getGreeting(selectedLanguage.code)} {data?.Name}
                     </h2>
-                    <div className="flex-1 flex items-center justify-center">
+                    <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-purple-100/30 to-transparent rounded-lg p-4">
                       <img
                         src={robotImage}
                         alt="LangBuddy"
-                        className="w-full h-[800px] object-contain"
+                        className="w-full h-[250px] object-contain drop-shadow-[0_0_15px_rgba(147,51,234,0.3)]"
                       />
                     </div>
-                    
                   </div>
                 </div>
 
