@@ -1,6 +1,6 @@
 ﻿# Learning Languages - From Words to Conversions...
 
-![Learning Languages Logo](logo.png)
+![Learning Languages Logo](client\src\assets\logo.png)
 
 ## 🎯 Overview
 
