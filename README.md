@@ -118,7 +118,7 @@ learning-languages/
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👥 Authors
-
+- Dev Joshi (devjjoshi0910@gmail.com)
 - Sujal Vadgama (mrvadgamas@gmail.com)
 
 ## 🙏 Acknowledgments
