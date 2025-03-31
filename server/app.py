@@ -113,7 +113,7 @@ def process_gujarati():
 # ---------------------------
 # Hindi Model
 # ---------------------------
-API_URL_hindi = "https://api-inference.huggingface.co/models/vasista22/whisper-hindi-small"
+API_URL_hindi = "https://router.huggingface.co/hf-inference/models/theainerd/Wav2Vec2-large-xlsr-hindi"
 headers_hindi = {"Authorization": f"Bearer {HF_ACCESS_TOKEN}"}
 
 @app.route('/process_hindi', methods=['POST'])

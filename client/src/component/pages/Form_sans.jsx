@@ -311,41 +311,38 @@ const AudioRecorder = () => {
           </div>
         </div>
 
-        <div className="button_container flex flex-wrap justify-center mb-4">
-          <button
-            onClick={playDemoAudio}
-            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-16 rounded mb-2 min-w-[425px] sm:min-w-[525px] md:min-w-[625px] text-lg"
-          >
-            Play Demo
-          </button>
-        </div>
+        <button
+          onClick={playDemoAudio}
+          className="w-full max-w-3xl mb-6 bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded text-lg transition-colors duration-200"
+        >
+          Play Demo
+        </button>
 
-        <div className="button_container flex flex-wrap justify-center mb-4">
+        <div className="w-full max-w-3xl flex flex-wrap gap-2 justify-center mb-6">
           <button
             onClick={startRecording}
             disabled={recording || uploaded}
-            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full sm:w-auto sm:mr-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-lg"
+            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-1 min-w-[140px]"
           >
             Start Recording
           </button>
           <button
             onClick={stopRecording}
             disabled={!recording || uploaded}
-            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full sm:w-auto sm:mr-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-lg"
+            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-1 min-w-[140px]"
           >
             Stop Recording
           </button>
           <button
             onClick={uploadBlob}
             disabled={audioChunks.length === 0 || uploaded || recording}
-            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full sm:w-auto sm:mr-2 disabled:opacity-50 disabled:cursor-not-allowed sm:text-lg"
+            className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed text-lg flex-1 min-w-[140px]"
           >
             Upload Audio
           </button>
           <button
             onClick={() => setShowConfirmationDialog(true)}
-            // disabled={!uploaded || recording}
-            className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded mb-2 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed sm:text-lg"
+            className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed text-lg min-w-[140px]"
           >
             Reset
           </button>
