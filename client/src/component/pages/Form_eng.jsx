@@ -18,6 +18,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../../firebase/Firebase";
+import Popup from "../components/Popup";
 
 const AudioRecorder = () => {
   const [id, setId] = useState(null);
@@ -36,6 +37,7 @@ const AudioRecorder = () => {
   const mediaStreamRef = useRef(null);
   const [totalPoints, setTotalPoints] = useState(50);
   const [earnedPoints, setEarnedPoints] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("userId");
@@ -177,13 +179,9 @@ const AudioRecorder = () => {
       const responseData = await response.json();
       console.log("Audio uploaded successfully:", responseData);
 
-      const stringToCheck = JSON.stringify(
-        responseData.text.replace(/<s>/g, "")
-      )
-        .replace(/\s{2,}/g, " ")
-        .replace(/^"(.*)"$/, "$1")
-        .trim()
-        .toLowerCase();
+      const stringToCheck = JSON.stringify(responseData?.text)
+        .replace(/|<\/s>|\s+/g, "")
+        .replace(/"/g, "");
 
       setResponse(stringToCheck);
       console.log("Outside ", stringToCheck);
@@ -193,14 +191,7 @@ const AudioRecorder = () => {
         stringToCheck == categoryData[currentCardIndex].english
       );
 
-      if (
-        stringToCheck ==
-        categoryData[currentCardIndex].english
-          .replace(/\s{2,}/g, " ")
-          .replace(/^"(.*)"$/, "$1")
-          .trim()
-          .toLowerCase()
-      ) {
+      if (stringToCheck == categoryData[currentCardIndex].english) {
         console.log("Inside ", stringToCheck);
         console.log(stringToCheck);
         toast.success("Great Job!");
@@ -211,12 +202,14 @@ const AudioRecorder = () => {
           updatedCount(newPoints); // Call updatedCount with the new points
           return newPoints;
         });
+
         setTimeout(() => {
           setCurrentCardIndex(currentCardIndex + 1);
           resetState();
         }, 3000);
       } else {
         toast.error("Please try again");
+        setShowPopup(true);
         resetState();
       }
 
@@ -376,6 +369,12 @@ const AudioRecorder = () => {
         </div>
       </div>
       <Footer />
+      <Popup
+        show={showPopup}
+        onClose={() => setShowPopup(false)}
+        currentLetter={categoryData[currentCardIndex].pronunciation}
+        language="english"
+      />
     </>
   );
 };

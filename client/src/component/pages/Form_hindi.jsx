@@ -18,6 +18,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../../firebase/Firebase";
+import Popup from "../components/Popup";
 
 const AudioRecorder = () => {
   const [id, setId] = useState(null);
@@ -36,6 +37,7 @@ const AudioRecorder = () => {
   const mediaStreamRef = useRef(null);
   const [totalPoints, setTotalPoints] = useState(100);
   const [earnedPoints, setEarnedPoints] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("userId");
@@ -168,11 +170,9 @@ const AudioRecorder = () => {
       const responseData = await response.json();
       console.log("Audio uploaded successfully:", responseData);
 
-      const stringToCheck = JSON.stringify(
-        responseData.text.replace(/<s>/g, "")
-      )
-        .replace(/\s/g, "")
-        .replace(/^"(.*)"$/, "$1");
+      const stringToCheck = JSON.stringify(responseData?.text)
+        .replace(/|<\/s>|\s+/g, "")
+        .replace(/"/g, "");
 
       setResponse(stringToCheck);
       console.log("Outside ", stringToCheck);
@@ -186,6 +186,7 @@ const AudioRecorder = () => {
         console.log("Inside ", stringToCheck);
         console.log(stringToCheck);
         toast.success("Great Job!");
+
         // Increment earned points by 5
         setEarnedPoints((prevPoints) => {
           const newPoints = prevPoints + 5;
@@ -199,6 +200,7 @@ const AudioRecorder = () => {
         }, 3000);
       } else {
         toast.error("Please try again");
+        setShowPopup(true);
         resetState();
       }
 
@@ -364,6 +366,12 @@ const AudioRecorder = () => {
         </div>
       </div>
       <Footer />
+      <Popup
+        show={showPopup}
+        onClose={() => setShowPopup(false)}
+        currentLetter={categoryData[currentCardIndex].pronunciation}
+        language="hindi"
+      />
     </>
   );
 };

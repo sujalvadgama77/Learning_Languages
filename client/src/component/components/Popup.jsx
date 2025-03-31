@@ -1,11 +1,11 @@
 // eslint-disable-next-line react/prop-types
-const Popup = ({ show, onClose, currentLetter }) => {
+const Popup = ({ show, onClose, currentLetter, language }) => {
   if (!show) return null;
 
   const playDemoAudio = () => {
     try {
-      // Construct the audio file path based on the pronunciation
-      const audioPath = `/audio/sanskrit/${currentLetter}.mp3`;
+      // Construct the audio file path based on the language and pronunciation
+      const audioPath = `/audio/${language}/${currentLetter}.mp3`;
       
       // Create and play the audio
       const audio = new Audio(audioPath);
