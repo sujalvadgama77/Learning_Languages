@@ -18,7 +18,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../../firebase/Firebase";
-import Popup from "../components/Popup";
+// import Popup from "../components/Popup";
 
 const AudioRecorder = () => {
   const [id, setId] = useState(null);
@@ -37,7 +37,7 @@ const AudioRecorder = () => {
   const mediaStreamRef = useRef(null);
   const [totalPoints, setTotalPoints] = useState(50);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  const [showPopup, setShowPopup] = useState(false);
+  // const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("userId");
@@ -179,27 +179,32 @@ const AudioRecorder = () => {
       const responseData = await response.json();
       console.log("Audio uploaded successfully:", responseData);
 
+      // Clean and normalize the response text
       const stringToCheck = JSON.stringify(responseData?.text)
-        .replace(/|<\/s>|\s+/g, "")
-        .replace(/"/g, "");
+        .replace(/|<\/s>|\s+/g, " ") // Replace multiple spaces with single space
+        .replace(/"/g, "") // Remove quotes
+        .trim() // Remove leading/trailing spaces
+        .split(" ").join(""); // Remove all spaces between characters
+
+      // Clean and normalize the expected text
+      const expectedText = categoryData[currentCardIndex].english
+        .trim()
+        .split(" ").join(""); // Remove all spaces between characters
 
       setResponse(stringToCheck);
-      console.log("Outside ", stringToCheck);
-      console.log("Outside ", categoryData[currentCardIndex].english);
-      console.log(
-        "Outside ",
-        stringToCheck == categoryData[currentCardIndex].english
-      );
+      console.log("Received text:", stringToCheck);
+      console.log("Expected text:", expectedText);
+      console.log("Are they equal:", stringToCheck.toLowerCase() === expectedText.toLowerCase());
 
-      if (stringToCheck == categoryData[currentCardIndex].english) {
-        console.log("Inside ", stringToCheck);
-        console.log(stringToCheck);
+      // Case-insensitive comparison of trimmed strings
+      if (stringToCheck.toLowerCase() === expectedText.toLowerCase()) {
+        console.log("Match found!");
         toast.success("Great Job!");
 
         // Increment earned points by 5
         setEarnedPoints((prevPoints) => {
           const newPoints = prevPoints + 5;
-          updatedCount(newPoints); // Call updatedCount with the new points
+          updatedCount(newPoints);
           return newPoints;
         });
 
@@ -208,14 +213,15 @@ const AudioRecorder = () => {
           resetState();
         }, 3000);
       } else {
+        console.log("No match. Received:", stringToCheck, "Expected:", expectedText);
         toast.error("Please try again");
-        setShowPopup(true);
         resetState();
       }
 
       setUploaded(true);
     } catch (error) {
       console.error("Error uploading audio:", error);
+      toast.error("Error processing audio");
       setAudioChunks([]);
     } finally {
       setUploading(false);
@@ -237,10 +243,31 @@ const AudioRecorder = () => {
     setUploading(false);
     setShowConfirmationDialog(false);
     setCurrentCardId(null);
+    // Don't reset showPopup here as it's handled separately
   };
 
   const handleConfirmation = () => {
     resetState();
+  };
+
+  const playDemoAudio = () => {
+    try {
+      // Get the current letter's pronunciation
+      const currentLetter = categoryData[currentCardIndex].pronunciation;
+      
+      // Construct the audio file path based on the pronunciation
+      const audioPath = `/audio/english/${currentLetter}.mp3`;
+      
+      // Create and play the audio
+      const audio = new Audio(audioPath);
+      audio.play().catch((error) => {
+        console.error("Error playing demo audio:", error);
+        toast.error("Could not play demo audio");
+      });
+    } catch (error) {
+      console.error("Error in playDemoAudio:", error);
+      toast.error("Error playing demo audio");
+    }
   };
 
   const updatedCount = async (newPoints) => {
@@ -297,8 +324,7 @@ const AudioRecorder = () => {
 
         <div className="button_container flex flex-wrap justify-center mb-4">
           <button
-            onClick={handlePlay}
-            disabled={!uploaded || recording}
+            onClick={playDemoAudio}
             className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-16 rounded mb-2 min-w-[425px] sm:min-w-[525px] md:min-w-[625px] text-lg"
           >
             Play Demo
@@ -369,12 +395,12 @@ const AudioRecorder = () => {
         </div>
       </div>
       <Footer />
-      <Popup
+      {/* <Popup
         show={showPopup}
         onClose={() => setShowPopup(false)}
         currentLetter={categoryData[currentCardIndex].pronunciation}
         language="english"
-      />
+      /> */}
     </>
   );
 };

@@ -112,13 +112,13 @@ export const words = [
   {
     id: 75,
     sanskrit: "दत्/दन्त",
-    pronunciation: "dát/dánta",
+    pronunciation: "dát or dánta",
     meaning: "Tooth",
   },
   {
     id: 76,
     sanskrit: "जिह्व/जिह्वा",
-    pronunciation: "jihvá/jihvā́",
+    pronunciation: "jihvá or jihvā́",
     meaning: "Tongue",
   },
   { id: 77, sanskrit: "नख", pronunciation: "nakhá", meaning: "Nail" },
@@ -175,7 +175,7 @@ export const words = [
   {
     id: 94,
     sanskrit: "ष्ठिव् – ष्ठिवति/ष्ठीव्यति",
-    pronunciation: "ṣṭiv – ṣṭívati/ṣṭhī́vyati",
+    pronunciation: "ṣṭiv – ṣṭívati/ or ṣṭhī́vyati",
     meaning: "To spit",
   },
   {

@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import robotImage from "../assets/chatbot.gif";
 import { auth, db } from "../../firebase/Firebase";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { generateAIResponse } from "../../services/openai";
+import { INITIAL_GREETINGS } from "../../config/openai";
+import { toast, ToastContainer } from "react-toastify";
+import TypewriterMessage from "../components/TypewriterMessage";
+import "react-toastify/dist/ReactToastify.css";
 
 const AIPractice = () => {
   const navigate = useNavigate();
@@ -12,6 +17,13 @@ const AIPractice = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [userName, setUserName] = useState("");
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const chatContainerRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [userPromptCount, setUserPromptCount] = useState(0);
+  const recognitionRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -37,10 +49,28 @@ const AIPractice = () => {
     fetchUserData();
   }, []);
 
+  // Auto scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (selectedLanguage) {
+      // Add initial greeting when language is selected
+      const initialGreeting = {
+        text: INITIAL_GREETINGS[selectedLanguage.code],
+        sender: "ai",
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setMessages([initialGreeting]);
+    }
+  }, [selectedLanguage]);
+
   const getGreeting = (langCode) => {
     const greetings = {
       en: "Hello",
-      sa: "नमस्कारः",
       hi: "नमस्ते",
       gu: "નમસ્તે"
     };
@@ -48,33 +78,233 @@ const AIPractice = () => {
   };
 
   const languages = [
-    { name: "Sanskrit", code: "sa", icon: "क" },
-    { name: "English", code: "en", icon: "A" },
-    { name: "Gujarati", code: "gu", icon: "ક" },
-    { name: "Hindi", code: "hi", icon: "क" },
+    { name: "English", code: "en", icon: "A" , languages: "english" },
+    { name: "Gujarati", code: "gu", icon: "ક" , languages: "gujarati" },
+    { name: "Hindi", code: "hi", icon: "क" , languages: "hindi" },
   ];
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (!inputMessage.trim()) return;
+  const startListening = () => {
+    const isBrave = navigator.brave !== undefined;
 
-    // Add user message
-    const newMessage = {
+    if (isBrave) {
+      toast.info('If you are using Brave browser, please: \n1. Click the Brave shield icon in the address bar\n2. Turn off "Shields" or set it to "Basic"\n3. Refresh the page and try again');
+    }
+
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new window.webkitSpeechRecognition();
+      recognitionRef.current = recognition;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      // Set language based on selected language
+      switch(selectedLanguage.code) {
+        case 'en':
+          recognition.lang = 'en-US';
+          break;
+        case 'hi':
+          recognition.lang = 'hi-IN';
+          break;
+        case 'gu':
+          recognition.lang = 'gu-IN';
+          break;
+        default:
+          recognition.lang = 'en-US';
+      }
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        toast.info('Listening...');
+        setInputMessage(''); // Clear any existing input
+      };
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        // Loop through the results to get both interim and final transcripts
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        // Update the input field with either final or interim results
+        setInputMessage(finalTranscript || interimTranscript);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        
+        switch(event.error) {
+          case 'network':
+            if (isBrave) {
+              toast.error('Network error. Please disable Brave shields for this site and try again.');
+            } else {
+              toast.error('Network error. Please check your internet connection.');
+            }
+            break;
+          case 'not-allowed':
+            toast.error('Microphone access denied. Please allow microphone access.');
+            break;
+          case 'no-speech':
+            toast.error('No speech detected. Please try again.');
+            break;
+          default:
+            toast.error('Speech recognition failed. Please try again.');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      // Add this to stop recognition after 5 seconds of silence
+      let silenceTimer;
+      recognition.onspeechend = () => {
+        silenceTimer = setTimeout(() => {
+          recognition.stop();
+        }, 2000); // Stop after 2 seconds of silence
+      };
+
+      recognition.onspeechstart = () => {
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (error) {
+        console.error('Speech recognition start error:', error);
+        setIsListening(false);
+        toast.error('Failed to start speech recognition. Please try again.');
+      }
+    } else {
+      toast.error('Speech recognition is not supported in your browser. Please use Chrome.');
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+      setIsListening(false);
+    }
+  };
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!inputMessage.trim() || isLoading) return;
+
+    // Stop recognition if it's active
+    stopListening();
+
+    const userMessage = {
       text: inputMessage,
       sender: "user",
       timestamp: new Date().toLocaleTimeString(),
     };
 
-    setMessages([...messages, newMessage]);
+    // Clear input using ref
+    const messageToSend = inputMessage;
     setInputMessage("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
 
-    // TODO: Add AI response logic here
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    setIsTyping(true);
+    setUserPromptCount(prev => prev + 1);
+
+    try {
+      const aiResponse = await generateAIResponse(
+        messageToSend,
+        selectedLanguage.code
+      );
+
+      const aiMessage = {
+        text: aiResponse,
+        sender: "ai",
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      toast.error("Failed to get AI response. Please try again.");
+      setIsLoading(false);
+      setIsTyping(false);
+    }
+  };
+
+  const handleRetakeTest = async () => {
+    try {
+      setIsLoading(true);
+      const resetResponse = await fetch(`http://16.171.8.103:5000/chat/${selectedLanguage.languages}/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (resetResponse.ok) {
+        setMessages([{
+          text: INITIAL_GREETINGS[selectedLanguage.code],
+          sender: "ai",
+          timestamp: new Date().toLocaleTimeString(),
+        }]);
+        setUserPromptCount(0);
+        toast.success('Test reset successfully!');
+      } else {
+        toast.error('Failed to reset test. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error resetting test:', error);
+      toast.error('Failed to reset test. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEndTest = async () => {
+    if (userPromptCount < 7) {
+      toast.warning('Please complete at least 7 prompts before ending the test.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const endResponse = await generateAIResponse(
+        "Please evaluate my language proficiency based on our conversation and provide a detailed feedback.",
+        selectedLanguage.code
+      );
+
+      const endMessage = {
+        text: endResponse,
+        sender: "ai",
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      setMessages(prev => [...prev, endMessage]);
+    } catch (error) {
+      console.error('Error ending test:', error);
+      toast.error('Failed to end test. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-gray-50">
+        <ToastContainer />
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button
@@ -110,7 +340,7 @@ const AIPractice = () => {
                   Practice with LangBuddy
                 </h1>
                 <p className="text-lg text-gray-600">
-                  Select a language and start chatting to improve your skills
+                  Select a language and start chatting to improve..!
                 </p>
               </div>
 
@@ -160,7 +390,10 @@ const AIPractice = () => {
                 <div className="lg:w-2/3">
                   <div className="bg-white rounded-xl shadow-lg h-[600px] flex flex-col">
                     {/* Chat Messages */}
-                    <div className="flex-1 overflow-y-auto p-6 border-b">
+                    <div 
+                      ref={chatContainerRef}
+                      className="flex-1 overflow-y-auto p-6 border-b"
+                    >
                       {messages.map((message, index) => (
                         <div
                           key={index}
@@ -177,30 +410,94 @@ const AIPractice = () => {
                                 : "bg-gray-100 text-gray-800"
                             }`}
                           >
-                            <p>{message.text}</p>
+                            {message.sender === "ai" ? (
+                              <TypewriterMessage 
+                                text={message.text} 
+                                onComplete={() => setIsTyping(false)}
+                              />
+                            ) : (
+                              <p className="whitespace-pre-wrap">{message.text}</p>
+                            )}
                             <span className="text-xs opacity-75 mt-1 block">
                               {message.timestamp}
                             </span>
                           </div>
                         </div>
                       ))}
+                      {isLoading && (
+                        <div className="flex justify-start mb-4">
+                          <div className="bg-gray-100 text-gray-800 rounded-lg p-3">
+                            <p>Typing...</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Message Input */}
+                    {/* Message Input with Microphone and Test Controls */}
                     <form onSubmit={handleSendMessage} className="p-4 bg-gray-50 rounded-b-xl">
                       <div className="flex items-center gap-4">
                         <input
+                          ref={inputRef}
                           type="text"
                           value={inputMessage}
                           onChange={(e) => setInputMessage(e.target.value)}
-                          placeholder="Type your message..."
+                          placeholder={`Type your message in ${selectedLanguage.name}...`}
                           className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          disabled={isLoading}
                         />
                         <button
-                          type="submit"
-                          className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors duration-200"
+                          type="button"
+                          onClick={startListening}
+                          className={`p-3 rounded-lg transition-colors duration-200 ${
+                            isListening 
+                              ? 'bg-red-500 text-white'
+                              : 'bg-gray-200 hover:bg-gray-300'
+                          }`}
+                          disabled={isLoading}
                         >
-                          Send
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            className="h-6 w-6" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={2} 
+                              d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" 
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRetakeTest}
+                          className="bg-yellow-500 text-white px-4 py-3 rounded-lg hover:bg-yellow-600 transition-colors duration-200 disabled:opacity-50"
+                          disabled={isLoading}
+                        >
+                          Re-Take Test
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleEndTest}
+                          className={`bg-green-500 text-white px-4 py-3 rounded-lg transition-colors duration-200 ${
+                            userPromptCount < 7 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600'
+                          } disabled:opacity-50`}
+                          disabled={isLoading || userPromptCount < 7}
+                        >
+                          End Test {userPromptCount < 7 ? `(${userPromptCount}/7)` : ''}
+                        </button>
+                        <button
+                          type="submit"
+                          className={`bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 ${
+                            isLoading 
+                              ? 'opacity-50 cursor-not-allowed'
+                              : 'hover:bg-purple-700'
+                          }`}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? 'Sending...' : 'Send'}
                         </button>
                       </div>
                     </form>
