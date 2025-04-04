@@ -183,23 +183,35 @@ const AudioRecorder = () => {
 
       // Clean and normalize the response text
       const stringToCheck = JSON.stringify(responseData?.text)
-        .replace(/|<\/s>|\s+/g, " ") // Replace multiple spaces with single space
-        .replace(/"/g, "") // Remove quotes
-        .trim() // Remove leading/trailing spaces
-        .split(" ").join(""); // Remove all spaces between characters
+        .replace(/<[^>]*>/g, '') // Remove all HTML-like tags
+        .replace(/[\\"\\']/g, '') // Remove quotes and backslashes
+        .replace(/[ः॥।]/g, '') // Remove Sanskrit punctuation marks
+        .replace(/[\u0951-\u0954]/g, '') // Remove Sanskrit accent marks
+        .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces and joiners
+        .replace(/\s+/g, '') // Remove all whitespace
+        .replace(/[०-९]/g, '') // Remove Sanskrit numerals
+        .replace(/[,.!?]/g, '') // Remove regular punctuation
+        .trim(); // Remove leading/trailing spaces
 
       // Clean and normalize the expected text
       const expectedText = categoryData[currentCardIndex].sanskrit
-        .trim()
-        .split(" ").join(""); // Remove all spaces between characters
+        .replace(/<[^>]*>/g, '')
+        .replace(/[\\"\\']/g, '')
+        .replace(/[ः॥।]/g, '')
+        .replace(/[\u0951-\u0954]/g, '')
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/\s+/g, '')
+        .replace(/[०-९]/g, '')
+        .replace(/[,.!?]/g, '')
+        .trim();
 
       setResponse(stringToCheck);
       console.log("Received text:", stringToCheck);
       console.log("Expected text:", expectedText);
-      console.log("Are they equal:", stringToCheck.toLowerCase() === expectedText.toLowerCase());
+      console.log("Are they equal:", stringToCheck === expectedText);
 
-      // Case-insensitive comparison of trimmed strings
-      if (stringToCheck.toLowerCase() === expectedText.toLowerCase()) {
+      // Compare the cleaned strings
+      if (stringToCheck === expectedText) {
         console.log("Match found!");
         toast.success("Great Job!");
 

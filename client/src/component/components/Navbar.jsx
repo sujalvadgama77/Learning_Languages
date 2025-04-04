@@ -2,6 +2,7 @@ import { useState } from "react";
 import { auth } from "../../firebase/Firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -62,6 +63,12 @@ function Navbar() {
                 >
                   Profile Page
                 </a>
+                <Link
+                  to="/pathway"
+                  className="text-black hover:bg-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Pathway
+                </Link>
                 <a
                   href="#"
                   onClick={handleSignOut}

@@ -19,6 +19,7 @@ import ProfileEditPage from "./component/pages/profile_edit_page.jsx";
 import ProtectedRoutes from "../src/context/ProtectedRoutes.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import AIPractice from "./component/pages/AIPractice";
+import Pathway from "./component/pages/Pathway";
 
 const AppRoutes = () => {
   return (
@@ -97,6 +98,14 @@ const AppRoutes = () => {
               element={
                 <ProtectedRoutes>
                   <ProfileEditPage />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/pathway"
+              element={
+                <ProtectedRoutes>
+                  <Pathway />
                 </ProtectedRoutes>
               }
             />

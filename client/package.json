@@ -14,6 +14,8 @@
     "bootstrap": "^5.3.3",
     "client": "file:",
     "firebase": "^10.10.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
     "react-circular-progressbar": "^2.1.0",
