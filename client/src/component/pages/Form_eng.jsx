@@ -18,7 +18,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../../firebase/Firebase";
-// import Popup from "../components/Popup";
+import Popup from "../components/Popup";
 
 const AudioRecorder = () => {
   const [id, setId] = useState(null);
@@ -37,7 +37,7 @@ const AudioRecorder = () => {
   const mediaStreamRef = useRef(null);
   const [totalPoints, setTotalPoints] = useState(50);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  // const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("userId");
@@ -179,43 +179,38 @@ const AudioRecorder = () => {
       const responseData = await response.json();
       console.log("Audio uploaded successfully:", responseData);
 
-      // Clean and normalize the response text
-      const stringToCheck = JSON.stringify(responseData?.text)
-        .replace(/|<\/s>|\s+/g, " ") // Replace multiple spaces with single space
-        .replace(/"/g, "") // Remove quotes
-        .trim() // Remove leading/trailing spaces
-        .split(" ").join(""); // Remove all spaces between characters
+      // Store and clean the received text immediately
+      const actualReceivedText = responseData?.text 
+        ? responseData.text
+            .replace(/<[^>]*>/g, '')  // Remove XML/HTML tags
+            .replace(/[\\"\\']/g, '')  // Remove quotes
+            .replace(/\s+/g, '')      // Remove whitespace
+            .replace(/[0-9]/g, '')    // Remove numerals
+            .replace(/[,.!?]/g, '')   // Remove punctuation
+            .trim()
+        : "No pronunciation detected";
+      setResponse(actualReceivedText);
 
-      // Clean and normalize the expected text
+      // Clean and normalize the response text for comparison
+      const stringToCheck = actualReceivedText;
       const expectedText = categoryData[currentCardIndex].english
-        .trim()
-        .split(" ").join(""); // Remove all spaces between characters
+        .replace(/\s+/g, '')
+        .trim();
 
-      setResponse(stringToCheck);
-      console.log("Received text:", stringToCheck);
-      console.log("Expected text:", expectedText);
-      console.log("Are they equal:", stringToCheck.toLowerCase() === expectedText.toLowerCase());
+      console.log('Received text:', stringToCheck);
+      console.log('Expected text:', expectedText);
 
-      // Case-insensitive comparison of trimmed strings
       if (stringToCheck.toLowerCase() === expectedText.toLowerCase()) {
-        console.log("Match found!");
-        toast.success("Great Job!");
-
-        // Increment earned points by 5
-        setEarnedPoints((prevPoints) => {
-          const newPoints = prevPoints + 5;
-          updatedCount(newPoints);
-          return newPoints;
-        });
-
+        toast.success('Correct pronunciation!');
+        setEarnedPoints(prevPoints => prevPoints + 5);
         setTimeout(() => {
           setCurrentCardIndex(currentCardIndex + 1);
           resetState();
         }, 3000);
       } else {
-        console.log("No match. Received:", stringToCheck, "Expected:", expectedText);
-        toast.error("Please try again");
-        resetState();
+        console.log('No match. Received:', stringToCheck);
+        console.log('Expected:', expectedText);
+        setShowPopup(true);
       }
 
       setUploaded(true);
@@ -395,12 +390,15 @@ const AudioRecorder = () => {
         </div>
       </div>
       <Footer />
-      {/* <Popup
+      <Popup
         show={showPopup}
         onClose={() => setShowPopup(false)}
         currentLetter={categoryData[currentCardIndex].pronunciation}
         language="english"
-      /> */}
+        onPlayDemo={playDemoAudio}
+        receivedText={response ? response.replace(/\s+/g, '') : "No pronunciation detected"}
+        expectedText={categoryData[currentCardIndex].english.replace(/\s+/g, '')}
+      />
     </>
   );
 };

@@ -59,7 +59,8 @@ const jsonData = [
       },
       { url: "https://github.com/sujalvadgama77", icon: "fab fa-github" },
     ],
-  }
+  },
+  
 ];
 
 const App = () => {

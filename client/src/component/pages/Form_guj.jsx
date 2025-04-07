@@ -397,6 +397,9 @@ const AudioRecorder = () => {
         onClose={() => setShowPopup(false)}
         currentLetter={categoryData[currentCardIndex].pronunciation}
         language="gujarati"
+        onPlayDemo={playDemoAudio}
+        receivedText={response ? response.replace(/\s+/g, '') : "No pronunciation detected"}
+        expectedText={categoryData[currentCardIndex].gujarati.replace(/\s+/g, '')}
       />
     </>
   );

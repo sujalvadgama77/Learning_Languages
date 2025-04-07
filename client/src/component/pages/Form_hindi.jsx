@@ -170,44 +170,41 @@ const AudioRecorder = () => {
       const responseData = await response.json();
       console.log("Audio uploaded successfully:", responseData);
 
-      // Clean and normalize the response text
-      const stringToCheck = JSON.stringify(responseData?.text)
-        .replace(/|<\/s>|\s+/g, " ") // Replace multiple spaces with single space
-        .replace(/"/g, "") // Remove quotes
-        .trim() // Remove leading/trailing spaces
-        .split(" ").join(""); // Remove all spaces between characters
+      // Store and clean the received text immediately
+      const actualReceivedText = responseData?.text 
+        ? responseData.text
+            .replace(/<[^>]*>/g, '')  // Remove XML/HTML tags
+            .replace(/[\\"\\']/g, '')  // Remove quotes
+            .replace(/[ः॥।]/g, '')    // Remove Hindi punctuation
+            .replace(/[\u0951-\u0954]/g, '') // Remove accents
+            .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces
+            .replace(/\s+/g, '')      // Remove whitespace
+            .replace(/[०-९]/g, '')    // Remove Hindi numerals
+            .replace(/[,.!?]/g, '')   // Remove punctuation
+            .trim()
+        : "No pronunciation detected";
+      setResponse(actualReceivedText);
 
-      // Clean and normalize the expected text
+      // Clean and normalize the response text for comparison
+      const stringToCheck = actualReceivedText;
       const expectedText = categoryData[currentCardIndex].hindi
-        .trim()
-        .split(" ").join(""); // Remove all spaces between characters
+        .replace(/\s+/g, '')
+        .trim();
 
-      setResponse(stringToCheck);
-      console.log("Received text:", stringToCheck);
-      console.log("Expected text:", expectedText);
-      console.log("Are they equal:", stringToCheck.toLowerCase() === expectedText.toLowerCase());
+      console.log('Received text:', stringToCheck);
+      console.log('Expected text:', expectedText);
 
-      // Case-insensitive comparison of trimmed strings
       if (stringToCheck.toLowerCase() === expectedText.toLowerCase()) {
-        console.log("Match found!");
-        toast.success("Great Job!");
-
-        // Increment earned points by 5
-        setEarnedPoints((prevPoints) => {
-          const newPoints = prevPoints + 5;
-          updatedCount(newPoints);
-          return newPoints;
-        });
-
+        toast.success('Correct pronunciation!');
+        setEarnedPoints(prevPoints => prevPoints + 5);
         setTimeout(() => {
           setCurrentCardIndex(currentCardIndex + 1);
           resetState();
         }, 3000);
       } else {
-        console.log("No match. Received:", stringToCheck, "Expected:", expectedText);
-        toast.error("Please try again");
+        console.log('No match. Received:', stringToCheck);
+        console.log('Expected:', expectedText);
         setShowPopup(true);
-        resetState();
       }
 
       setUploaded(true);
@@ -397,6 +394,9 @@ const AudioRecorder = () => {
         onClose={() => setShowPopup(false)}
         currentLetter={categoryData[currentCardIndex].pronunciation}
         language="hindi"
+        onPlayDemo={playDemoAudio}
+        receivedText={response ? response.replace(/\s+/g, '') : "No pronunciation detected"}
+        expectedText={categoryData[currentCardIndex].hindi.replace(/\s+/g, '')}
       />
     </>
   );

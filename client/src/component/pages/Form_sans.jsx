@@ -181,17 +181,23 @@ const AudioRecorder = () => {
       const responseData = await response.json();
       console.log("Audio uploaded successfully:", responseData);
 
-      // Clean and normalize the response text
-      const stringToCheck = JSON.stringify(responseData?.text)
-        .replace(/<[^>]*>/g, '') // Remove all HTML-like tags
-        .replace(/[\\"\\']/g, '') // Remove quotes and backslashes
-        .replace(/[ः॥।]/g, '') // Remove Sanskrit punctuation marks
-        .replace(/[\u0951-\u0954]/g, '') // Remove Sanskrit accent marks
-        .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces and joiners
-        .replace(/\s+/g, '') // Remove all whitespace
-        .replace(/[०-९]/g, '') // Remove Sanskrit numerals
-        .replace(/[,.!?]/g, '') // Remove regular punctuation
-        .trim(); // Remove leading/trailing spaces
+      // Store the actual received text immediately
+      const actualReceivedText = responseData?.text 
+        ? responseData.text
+            .replace(/<[^>]*>/g, '')  // Remove XML/HTML tags
+            .replace(/[\\"\\']/g, '')  // Remove quotes
+            .replace(/[ः॥।]/g, '')    // Remove Sanskrit punctuation
+            .replace(/[\u0951-\u0954]/g, '') // Remove Sanskrit accents
+            .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces
+            .replace(/\s+/g, '')      // Remove whitespace
+            .replace(/[०-९]/g, '')    // Remove Sanskrit numerals
+            .replace(/[,.!?]/g, '')   // Remove punctuation
+            .trim()
+        : "No pronunciation detected";
+      setResponse(actualReceivedText);
+
+      // Clean and normalize the response text for comparison
+      const stringToCheck = actualReceivedText;
 
       // Clean and normalize the expected text
       const expectedText = categoryData[currentCardIndex].sanskrit
@@ -205,7 +211,6 @@ const AudioRecorder = () => {
         .replace(/[,.!?]/g, '')
         .trim();
 
-      setResponse(stringToCheck);
       console.log("Received text:", stringToCheck);
       console.log("Expected text:", expectedText);
       console.log("Are they equal:", stringToCheck === expectedText);
@@ -214,8 +219,6 @@ const AudioRecorder = () => {
       if (stringToCheck === expectedText) {
         console.log("Match found!");
         toast.success("Great Job!");
-
-        // Increment earned points by 5
         setEarnedPoints((prevPoints) => {
           const newPoints = prevPoints + 5;
           updatedCount(newPoints);
@@ -227,10 +230,9 @@ const AudioRecorder = () => {
           resetState();
         }, 3000);
       } else {
-        console.log("No match. Received:", stringToCheck, "Expected:", expectedText);
+        console.log("No match. Received:", actualReceivedText, "Expected:", expectedText);
         toast.error("Please try again");
         setShowPopup(true);
-        resetState();
       }
 
       setUploaded(true);
@@ -254,7 +256,6 @@ const AudioRecorder = () => {
     setAudioChunks([]);
     setAudioURL(null);
     setUploaded(false);
-    setResponse("No Data");
     setModelLoaded(false);
     setUploading(false);
     setShowConfirmationDialog(false);
@@ -402,6 +403,10 @@ const AudioRecorder = () => {
         show={showPopup}
         onClose={() => setShowPopup(false)}
         currentLetter={categoryData[currentCardIndex].pronunciation}
+        language="sanskrit"
+        onPlayDemo={playDemoAudio}
+        receivedText={response ? response.replace(/\s+/g, '') : "No pronunciation detected"}
+        expectedText={categoryData[currentCardIndex].sanskrit.replace(/\s+/g, '')}
       />
     </>
   );

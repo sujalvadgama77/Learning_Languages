@@ -1,21 +1,6 @@
 // eslint-disable-next-line react/prop-types
-const Popup = ({ show, onClose, currentLetter, language }) => {
+const Popup = ({ show, onClose, currentLetter, language, onPlayDemo, receivedText, expectedText }) => {
   if (!show) return null;
-
-  const playDemoAudio = () => {
-    try {
-      // Construct the audio file path based on the language and pronunciation
-      const audioPath = `/audio/${language}/${currentLetter}.mp3`;
-      
-      // Create and play the audio
-      const audio = new Audio(audioPath);
-      audio.play().catch((error) => {
-        console.error("Error playing demo audio:", error);
-      });
-    } catch (error) {
-      console.error("Error in playDemoAudio:", error);
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -34,14 +19,26 @@ const Popup = ({ show, onClose, currentLetter, language }) => {
         </h2>
 
         {/* Message */}
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-gray-600 mb-4">
           Listen to the correct pronunciation and try again
         </p>
+
+        {/* Display Text Comparison */}
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mb-3">
+            <p className="font-semibold text-red-600">Your pronunciation:</p>
+            <p className="text-gray-800 break-words font-mono">{receivedText || "No pronunciation detected"}</p>
+          </div>
+          <div>
+            <p className="font-semibold text-green-600">Expected pronunciation:</p>
+            <p className="text-gray-800 break-words font-mono">{expectedText || "No expected text"}</p>
+          </div>
+        </div>
 
         {/* Play Button */}
         <div className="flex justify-center mb-6">
           <button
-            onClick={playDemoAudio}
+            onClick={onPlayDemo}
             className="bg-purple-500 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-full flex items-center space-x-2 transform transition-transform duration-200 hover:scale-105"
           >
             <span className="text-2xl">▶</span>
