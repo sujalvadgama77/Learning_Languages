@@ -56,19 +56,19 @@ function Navbar() {
                 >
                   Contact Us
                 </a>
-                <a
-                  href="#"
-                  onClick={() => navigate("/profile")}
-                  className="text-black hover:bg-gray-300 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Profile Page
-                </a>
                 <Link
                   to="/pathway"
                   className="text-black hover:bg-gray-300 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Pathway
                 </Link>
+                <a
+                  href="#"
+                  onClick={() => navigate("/profile")}
+                  className="text-black hover:bg-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Profile
+                </a>
                 <a
                   href="#"
                   onClick={handleSignOut}
@@ -150,6 +150,13 @@ function Navbar() {
               className="text-black block px-3 py-2 rounded-md text-base font-medium"
             >
               Contact Us
+            </a>
+            <a
+              href="#"
+              onClick={() => navigate("/pathway")}
+              className="text-black block px-3 py-2 rounded-md text-base font-medium"
+            >
+              Pathway
             </a>
             <a
               href="#"

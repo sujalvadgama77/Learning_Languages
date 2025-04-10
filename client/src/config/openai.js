@@ -1,8 +1,8 @@
 // API Configuration
 export const API_ENDPOINTS = {
-  en: "http://16.171.8.103:5000/chat/english",
-  hi: "http://16.171.8.103:5000/chat/hindi",
-  gu: "http://16.171.8.103:5000/chat/gujarati"
+  en: "https://kzgljnfz-5001.inc1.devtunnels.ms/chat/english",
+  hi: "https://kzgljnfz-5001.inc1.devtunnels.ms/chat/hindi",
+  gu: "https://kzgljnfz-5001.inc1.devtunnels.ms/chat/gujarati"
 };
 
 // Initial greetings for each language

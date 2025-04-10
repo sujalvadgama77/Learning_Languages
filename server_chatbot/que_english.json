@@ -1,0 +1,44 @@
+{
+    "Introduction": [
+        "Can you tell me a little about yourself?",
+        "Where are you from and what languages do you speak?",
+        "What's your name and what do you like to be called?"
+    ],
+    "Hobbies & Interests": [
+        "What do you enjoy doing in your free time?",
+        "Tell me about a hobby you've had for a long time.",
+        "Have you picked up any new interests recently?",
+        "What's something you're passionate about and why?",
+        "What would you like to learn someday?"
+    ],
+    "Daily Life": [
+        "Can you describe your typical day?",
+        "What's your morning routine like?",
+        "What do you usually eat for breakfast,lunch & dinner?",
+        "How do you get to work or school?",
+        "What's your favorite part of your daily routine?",
+        "What household chores do you find easy or difficult?"
+    ],
+    "Opinions & Preferences": [
+        "What kind of music/movies/books do you enjoy?",
+        "What's your favorite season and why?",
+        "Would you rather live in a city or the countryside?",
+        "What's something you've changed your mind about recently?",
+        "If you could change one thing about your city, what would it be?",
+        "What qualities do you value most in a friend?"
+    ],
+    "Situational Questions": [
+        "How would you ask for directions if you were lost?",
+        "How would you order food at a restaurant?",
+        "Could you explain how to get to your home from the nearest airport?",
+        "How would you complain about poor service?",
+        "How would you invite someone to an event?"
+    ],
+    "Hypothetical Questions": [
+        "If you could travel anywhere, where would you go and why?",
+        "What would you do if you won a large sum of money?",
+        "If you could have dinner with anyone, living or dead, who would it be?",
+        "What would your ideal day look like?",
+        "If you could live in another time period, which would you choose?"
+    ]
+}

@@ -14,7 +14,7 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:5173",
-            "https://uem-hackathon.vercel.app"
+            "https://kzgljnfz-5173.inc1.devtunnels.ms"
         ]
     }
 })

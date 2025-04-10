@@ -246,7 +246,7 @@ const AIPractice = () => {
   const handleRetakeTest = async () => {
     try {
       setIsLoading(true);
-      const resetResponse = await fetch(`http://16.171.8.103:5000/chat/${selectedLanguage.languages}/reset`, {
+      const resetResponse = await fetch(`https://kzgljnfz-5001.inc1.devtunnels.ms/chat/${selectedLanguage.languages}/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -433,74 +433,67 @@ const AIPractice = () => {
                       )}
                     </div>
 
-                    {/* Message Input with Microphone and Test Controls */}
-                    <form onSubmit={handleSendMessage} className="p-4 bg-gray-50 rounded-b-xl">
-                      <div className="flex items-center gap-4">
-                        <input
-                          ref={inputRef}
-                          type="text"
-                          value={inputMessage}
-                          onChange={(e) => setInputMessage(e.target.value)}
-                          placeholder={`Type your message in ${selectedLanguage.name}...`}
-                          className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          disabled={isLoading}
-                        />
-                        <button
-                          type="button"
-                          onClick={startListening}
-                          className={`p-3 rounded-lg transition-colors duration-200 ${
-                            isListening 
-                              ? 'bg-red-500 text-white'
-                              : 'bg-gray-200 hover:bg-gray-300'
-                          }`}
-                          disabled={isLoading}
-                        >
-                          <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            className="h-6 w-6" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor"
+                    {/* Input area */}
+                    <div className="p-4 border-t border-gray-200 bg-white">
+                      <form onSubmit={handleSendMessage} className="space-y-3">
+                        {/* Row 1: Text Input, Mic, Send */}
+                        <div className="flex items-end space-x-2">
+                          <textarea
+                            ref={inputRef}
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder={`Type your message in ${selectedLanguage?.name}...`}
+                            className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent resize-none"
+                            rows="1"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendMessage(e);
+                              }
+                            }}
+                            disabled={!selectedLanguage || isLoading}
+                          />
+                          <button
+                            type="button"
+                            onClick={isListening ? stopListening : startListening}
+                            className={`p-2 rounded-full flex-shrink-0 transition-colors duration-200 ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} disabled:opacity-50`}
+                            disabled={!selectedLanguage || isLoading}
+                            aria-label={isListening ? "Stop listening" : "Start listening"}
                           >
-                            <path 
-                              strokeLinecap="round" 
-                              strokeLinejoin="round" 
-                              strokeWidth={2} 
-                              d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" 
-                            />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleRetakeTest}
-                          className="bg-yellow-500 text-white px-4 py-3 rounded-lg hover:bg-yellow-600 transition-colors duration-200 disabled:opacity-50"
-                          disabled={isLoading}
-                        >
-                          Re-Take Test
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleEndTest}
-                          className={`bg-green-500 text-white px-4 py-3 rounded-lg transition-colors duration-200 ${
-                            userPromptCount < 7 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600'
-                          } disabled:opacity-50`}
-                          disabled={isLoading || userPromptCount < 7}
-                        >
-                          End Test {userPromptCount < 7 ? `(${userPromptCount}/7)` : ''}
-                        </button>
-                        <button
-                          type="submit"
-                          className={`bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 ${
-                            isLoading 
-                              ? 'opacity-50 cursor-not-allowed'
-                              : 'hover:bg-purple-700'
-                          }`}
-                          disabled={isLoading}
-                        >
-                          {isLoading ? 'Sending...' : 'Send'}
-                        </button>
-                      </div>
-                    </form>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={isLoading || !inputMessage.trim() || !selectedLanguage}
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 flex-shrink-0"
+                          >
+                            Send
+                          </button>
+                        </div>
+
+                        {/* Row 2: Action Buttons */}
+                        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                           <button
+                            type="button"
+                            onClick={handleRetakeTest}
+                            disabled={isLoading || !selectedLanguage}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 disabled:opacity-50 text-sm"
+                          >
+                            Re-Take Test
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleEndTest}
+                            disabled={isLoading || !selectedLanguage}
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 disabled:opacity-50 text-sm"
+                          >
+                            End Test ({userPromptCount}/7)
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
