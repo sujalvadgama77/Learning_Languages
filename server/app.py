@@ -14,7 +14,8 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:5173",
-            "https://kzgljnfz-5173.inc1.devtunnels.ms"
+            "https://kzgljnfz-5173.inc1.devtunnels.ms",
+            "https://learning-languages-chatbotserver.vercel.app"
         ]
     }
 })
