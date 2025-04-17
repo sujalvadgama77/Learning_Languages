@@ -246,7 +246,7 @@ const AIPractice = () => {
   const handleRetakeTest = async () => {
     try {
       setIsLoading(true);
-      const resetResponse = await fetch(`https://kzgljnfz-5001.inc1.devtunnels.ms/chat/${selectedLanguage.languages}/reset`, {
+      const resetResponse = await fetch(`http://127.0.0.1:5001/chat/${selectedLanguage.languages}/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
