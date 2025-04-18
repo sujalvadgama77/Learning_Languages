@@ -10,14 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Apply CORS globally for specific origins
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "http://localhost:5173",
-            "https://learning-languages-gg4c.onrender.com"
-        ]
-    }
-})
+CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Initialize a counter for filenames
