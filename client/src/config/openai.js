@@ -1,8 +1,8 @@
 // API Configuration
 export const API_ENDPOINTS = {
-  en: "https://learning-languages-chatbotserver.vercel.app/chat/english",
-  hi: "https://learning-languages-chatbotserver.vercel.app/chat/hindi",
-  gu: "https://learning-languages-chatbotserver.vercel.app/chat/gujarati"
+  en: "https://learning-languages-chatbot-server.onrender.com/chat/english",
+  hi: "https://learning-languages-chatbot-server.onrender.com/chat/hindi",
+  gu: "https://learning-languages-chatbot-server.onrender.com/chat/gujarati"
 };
 
 // Initial greetings for each language

@@ -246,7 +246,7 @@ const AIPractice = () => {
   const handleRetakeTest = async () => {
     try {
       setIsLoading(true);
-      const resetResponse = await fetch(`https://learning-languages-chatbotserver.vercel.app/chat/${selectedLanguage.languages}/reset`, {
+      const resetResponse = await fetch(`https://learning-languages-chatbot-server.onrender.com/chat/${selectedLanguage.languages}/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
