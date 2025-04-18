@@ -15,6 +15,8 @@ Learning Languages is an interactive platform designed to help users learn new l
 - 📱 Responsive design
 - 🔐 User authentication
 - 📊 Performance analytics
+- 🧑‍🤝‍🧑 LangBuddy AI Assistance for practicing conversations and improving language proficiency
+- 🎓 Certification on completion
 
 ## 🛠️ Tech Stack
 
@@ -61,6 +63,13 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+```bash
+cd ../server_chatbot
+python -m venv .myvenv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
 4. Environment Setup
 Create a `.env` file in the client directory with the following variables:
 ```env
@@ -80,7 +89,13 @@ cd server
 python app.py
 ```
 
-2. Start the Frontend Development Server
+2. Start the Backend Server for AI Chatbot
+```bash
+cd server_chatbot
+python application.py
+```
+
+3. Start the Frontend Development Server
 ```bash
 cd client
 npm run dev
@@ -102,6 +117,9 @@ learning-languages/
 ├── server/                 # Backend Flask application
 │   ├── app.py            # Main server file
 │   └── requirements.txt   # Python dependencies
+├── server_chatbot/                 # Backend Flask application
+│   ├── application.py            # Main server file for AI_Chatbot
+│   └── requirements.txt   # Python dependencies
 └── README.md             # Project documentation
 ```
 
@@ -118,7 +136,6 @@ learning-languages/
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👥 Authors
-- Dev Joshi (devjjoshi0910@gmail.com)
 - Sujal Vadgama (mrvadgamas@gmail.com)
 
 ## 🙏 Acknowledgments
